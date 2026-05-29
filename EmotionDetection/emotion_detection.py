@@ -13,18 +13,25 @@ def emotion_detector(text_to_analyze):
 	# Make a POST request to the API with the payload and headers
     response = requests.post(url, json=mydoc, headers=header, timeout = 5)
     
-    formatted_response = json.loads(response.text)
+    if response.status_code == 200:    
+        formatted_response = json.loads(response.text)
+        anger_score =  formatted_response['emotionPredictions'][0]['emotion']['anger']
+        disgust_score = formatted_response['emotionPredictions'][0]['emotion']['disgust']
+        fear_score = formatted_response['emotionPredictions'][0]['emotion']['fear']
+        joy_score = formatted_response['emotionPredictions'][0]['emotion']['joy']
+        sadness_score = formatted_response['emotionPredictions'][0]['emotion']['sadness']
+        #Code to find the dominant emotion: the emotion with the highest score
+        emotion_scores = formatted_response['emotionPredictions'][0]['emotion']
+        dominant_emotion = max(emotion_scores, key=emotion_scores.get)
 
-    anger_score =  formatted_response['emotionPredictions'][0]['emotion']['anger']
-    disgust_score = formatted_response['emotionPredictions'][0]['emotion']['disgust']
-    fear_score = formatted_response['emotionPredictions'][0]['emotion']['fear']
-    joy_score = formatted_response['emotionPredictions'][0]['emotion']['joy']
-    sadness_score = formatted_response['emotionPredictions'][0]['emotion']['sadness']
-    
-    #Code to find the dominant emotion: the emotion with the highest score
-    emotion_scores = formatted_response['emotionPredictions'][0]['emotion']
-    dominant_emotion = max(emotion_scores, key=emotion_scores.get)
-
+    elif response.status_code == 400:
+        anger_score =  None
+        disgust_score = None
+        fear_score = None
+        joy_score = None
+        sadness_score = None
+        dominant_emotion = None
+            
     response_dict = {
         'anger': anger_score, 'disgust':disgust_score, 
         'fear':fear_score, 'joy': joy_score, 'sadness':sadness_score,
